@@ -1,5 +1,8 @@
 # gitrescue
 
+[![ci](https://github.com/hahaha678/gitrescue/actions/workflows/ci.yml/badge.svg)](https://github.com/hahaha678/gitrescue/actions/workflows/ci.yml)
+[![release](https://github.com/hahaha678/gitrescue/actions/workflows/release.yml/badge.svg)](https://github.com/hahaha678/gitrescue/actions/workflows/release.yml)
+
 **You broke git. Let's find out how bad it is.**
 
 `gitrescue` is a read-only diagnosis of your repository. Run it when something

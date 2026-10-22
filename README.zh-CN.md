@@ -1,5 +1,8 @@
 # gitrescue
 
+[![ci](https://github.com/hahaha678/gitrescue/actions/workflows/ci.yml/badge.svg)](https://github.com/hahaha678/gitrescue/actions/workflows/ci.yml)
+[![release](https://github.com/hahaha678/gitrescue/actions/workflows/release.yml/badge.svg)](https://github.com/hahaha678/gitrescue/actions/workflows/release.yml)
+
 **把 git 搞坏了？先别慌，看看现在到底怎么了。**
 
 `gitrescue` 是一个**只读**的仓库诊断工具。`git reset --hard` 之后、rebase 卡在半路、
