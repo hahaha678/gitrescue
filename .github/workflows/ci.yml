@@ -34,11 +34,12 @@ jobs:
         run: go build ./...
 
       # 这个工具自己也得经得起自己的检查。
+      # 报告写到临时目录，否则会弄脏工作区。
       - name: dogfood
         shell: bash
         run: |
-          go run . --no-color --json > report.json
-          test -s report.json
+          go run . --no-color --json > "$RUNNER_TEMP/report.json"
+          test -s "$RUNNER_TEMP/report.json"
 
       - name: working tree must stay clean
         shell: bash
