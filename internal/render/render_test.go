@@ -49,3 +49,32 @@ func TestWrapKeepsContent(t *testing.T) {
 		t.Errorf("wrap lost or duplicated characters: %q", joined)
 	}
 }
+
+// 英文单词不能被从中间切开。
+func TestWrapKeepsEnglishWordsWhole(t *testing.T) {
+	lines := wrap("在那之前，reflog 和 fsck 都能把它们找回来", 22)
+	for _, want := range []string{"reflog", "fsck"} {
+		found := false
+		for _, l := range lines {
+			if strings.Contains(l, want) {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("word %q was split across lines: %q", want, lines)
+		}
+	}
+}
+
+// CJK 段落应该把每一行都填满，不能提前折行。
+func TestWrapFillsCJKWidth(t *testing.T) {
+	lines := wrap(strings.Repeat("中", 30), 20)
+	if len(lines) != 3 {
+		t.Fatalf("want 3 lines, got %d: %q", len(lines), lines)
+	}
+	for _, l := range lines {
+		if w := displayWidth(l); w != 20 {
+			t.Errorf("line %q has width %d, want 20", l, w)
+		}
+	}
+}

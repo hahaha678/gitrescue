@@ -164,41 +164,85 @@ func runeWidth(r rune) int {
 	}
 }
 
-// wrap 按显示宽度折行。没有空格的 CJK 文本直接在任意字符处断开。
+// token 是折行的最小单位：连续的英文单词或代码片段算一个整体，其余字符各算一个。
+type token struct {
+	rs    []rune
+	width int
+	space bool
+}
+
+func tokenize(s string, limit int) []token {
+	var tokens []token
+	var word []rune
+
+	flush := func() {
+		if len(word) == 0 {
+			return
+		}
+		if w := displayWidth(string(word)); w <= limit {
+			tokens = append(tokens, token{rs: word, width: w})
+		} else {
+			// 超长标识符（比如一整条 URL）没法整体放下，只能硬切。
+			for _, r := range word {
+				tokens = append(tokens, token{rs: []rune{r}, width: runeWidth(r)})
+			}
+		}
+		word = nil
+	}
+
+	for _, r := range s {
+		switch {
+		case r == ' ' || r == '\t':
+			flush()
+			tokens = append(tokens, token{rs: []rune{r}, width: 1, space: true})
+		case isWordRune(r):
+			word = append(word, r)
+		default:
+			flush()
+			tokens = append(tokens, token{rs: []rune{r}, width: runeWidth(r)})
+		}
+	}
+	flush()
+	return tokens
+}
+
+// isWordRune 判断字符是否属于不该被从中间切断的英文单词或代码片段。
+func isWordRune(r rune) bool {
+	if r >= 0x80 {
+		return false
+	}
+	if unicode.IsLetter(r) || unicode.IsDigit(r) {
+		return true
+	}
+	return strings.ContainsRune("-_.:/@+=~%?&#", r)
+}
+
+// wrap 按显示宽度折行。CJK 可以在任意字符处断开，英文单词保持完整。
 func wrap(s string, limit int) []string {
 	var lines []string
 	var cur []rune
 	used := 0
 
-	for _, r := range s {
-		rw := runeWidth(r)
-		if used+rw > limit && len(cur) > 0 {
-			if idx := lastSpace(cur); idx > len(cur)/2 {
-				lines = append(lines, string(cur[:idx]))
-				cur = cur[idx+1:]
-				used = displayWidth(string(cur))
-			} else {
-				lines = append(lines, string(cur))
-				cur = cur[:0]
-				used = 0
-			}
+	push := func() {
+		lines = append(lines, strings.TrimRight(string(cur), " \t"))
+		cur = nil
+		used = 0
+	}
+
+	for _, t := range tokenize(s, limit) {
+		if used+t.width > limit && used > 0 {
+			push()
 		}
-		cur = append(cur, r)
-		used += rw
+		if used == 0 && t.space {
+			continue // 行首不保留空格
+		}
+		cur = append(cur, t.rs...)
+		used += t.width
 	}
 	if len(cur) > 0 {
-		lines = append(lines, string(cur))
+		push()
 	}
 	return lines
-}
-
-func lastSpace(rs []rune) int {
-	for i := len(rs) - 1; i >= 0; i-- {
-		if rs[i] == ' ' {
-			return i
-		}
-	}
-	return -1
 }
 
 func shortenPath(p string) string {
