@@ -53,6 +53,9 @@ gitrescue  detached @ 13ef966
 
 ## Install
 
+Prebuilt binaries for Linux, macOS and Windows (amd64 / arm64) are attached to
+every [release](https://github.com/yourname/gitrescue/releases) — no Go required.
+
 ```sh
 go install github.com/yourname/gitrescue@latest
 ```
@@ -111,6 +114,27 @@ and a test that builds the broken state from scratch.
 go test ./...
 go vet ./...
 ```
+
+## Releasing
+
+GoReleaser builds the release on tag push:
+
+```sh
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin v0.1.0
+```
+
+The `release` workflow runs the tests, cross-compiles linux / darwin / windows
+for amd64 and arm64, packs `tar.gz` (`.zip` on Windows), writes `checksums.txt`
+and publishes the GitHub release. To run the whole thing locally without
+publishing:
+
+```sh
+goreleaser release --snapshot --clean --skip=publish
+```
+
+The version is injected with `-X main.version={{ .Version }}`, so
+`gitrescue --version` matches the tag.
 
 ## License
 

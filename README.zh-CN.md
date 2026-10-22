@@ -52,6 +52,9 @@ gitrescue  detached @ 13ef966
 
 ## 安装
 
+每个 [release](https://github.com/yourname/gitrescue/releases) 都附带 Linux、macOS、
+Windows（amd64 / arm64）的预编译二进制，不需要装 Go。
+
 ```sh
 go install github.com/yourname/gitrescue@latest
 ```
@@ -106,6 +109,26 @@ git 的每一次恢复都是写操作，而一个猜错的工具只会让事情�
 go test ./...
 go vet ./...
 ```
+
+## 发布流程
+
+打 tag 之后由 GoReleaser 自动构建：
+
+```sh
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin v0.1.0
+```
+
+`release` workflow 会先跑测试，再交叉编译 linux / darwin / windows 的 amd64 和
+arm64，打成 `tar.gz`（Windows 是 `.zip`），生成 `checksums.txt`，最后发布 GitHub
+release。想在本地完整跑一遍但不发布：
+
+```sh
+goreleaser release --snapshot --clean --skip=publish
+```
+
+版本号通过 `-X main.version={{ .Version }}` 注入，所以 `gitrescue --version`
+和 tag 一致。
 
 ## 许可证
 

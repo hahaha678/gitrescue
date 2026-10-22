@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: gitrescue
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: gitrescue
+    main: .
+    binary: gitrescue
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    # 版本号写进 -version 的输出里。
+    ldflags:
+      - -s -w
+      - -X main.version={{ .Version }}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    files:
+      - README.md
+      - README.zh-CN.md
+      - LICENSE
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  groups:
+    - title: 新功能
+      regexp: '^feat(\(.+\))?!?:'
+      order: 0
+    - title: 修复
+      regexp: '^fix(\(.+\))?!?:'
+      order: 1
+    - title: 其他改动
+      order: 999
+  filters:
+    # 只改文档、测试、CI 的提交不值得出现在发布说明里。
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+      - '^style:'
+      - '^Merge '
+
+release:
+  draft: false
+  prerelease: auto
