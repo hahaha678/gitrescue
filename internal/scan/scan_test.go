@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"gitrescue/internal/gitcmd"
-	"gitrescue/internal/i18n"
-	"gitrescue/internal/scan"
+	"github.com/hahaha678/gitrescue/internal/gitcmd"
+	"github.com/hahaha678/gitrescue/internal/i18n"
+	"github.com/hahaha678/gitrescue/internal/scan"
 )
 
 // git 在 dir 里跑一条 git 命令。用一次性的身份和环境，

@@ -52,17 +52,17 @@ gitrescue  detached @ 13ef966
 
 ## 安装
 
-每个 [release](https://github.com/yourname/gitrescue/releases) 都附带 Linux、macOS、
+每个 [release](https://github.com/hahaha678/gitrescue/releases) 都附带 Linux、macOS、
 Windows（amd64 / arm64）的预编译二进制，不需要装 Go。
 
 ```sh
-go install github.com/yourname/gitrescue@latest
+go install github.com/hahaha678/gitrescue@latest
 ```
 
 或者从源码构建：
 
 ```sh
-git clone https://github.com/yourname/gitrescue
+git clone https://github.com/hahaha678/gitrescue
 cd gitrescue
 go build -o gitrescue .
 ```

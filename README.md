@@ -54,16 +54,16 @@ gitrescue  detached @ 13ef966
 ## Install
 
 Prebuilt binaries for Linux, macOS and Windows (amd64 / arm64) are attached to
-every [release](https://github.com/yourname/gitrescue/releases) — no Go required.
+every [release](https://github.com/hahaha678/gitrescue/releases) — no Go required.
 
 ```sh
-go install github.com/yourname/gitrescue@latest
+go install github.com/hahaha678/gitrescue@latest
 ```
 
 Or from source:
 
 ```sh
-git clone https://github.com/yourname/gitrescue
+git clone https://github.com/hahaha678/gitrescue
 cd gitrescue
 go build -o gitrescue .
 ```

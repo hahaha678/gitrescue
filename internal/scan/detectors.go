@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"gitrescue/internal/gitcmd"
-	"gitrescue/internal/i18n"
+	"github.com/hahaha678/gitrescue/internal/gitcmd"
+	"github.com/hahaha678/gitrescue/internal/i18n"
 )
 
 // ---------- 公共小工具 ----------

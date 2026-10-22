@@ -11,9 +11,9 @@ import (
 	"strings"
 	"unicode"
 
-	"gitrescue/internal/i18n"
-	"gitrescue/internal/scan"
-	"gitrescue/internal/style"
+	"github.com/hahaha678/gitrescue/internal/i18n"
+	"github.com/hahaha678/gitrescue/internal/scan"
+	"github.com/hahaha678/gitrescue/internal/style"
 )
 
 // width 是报告正文的宽度（显示列数，不是字节数）。

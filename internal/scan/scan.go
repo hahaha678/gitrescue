@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"gitrescue/internal/gitcmd"
+	"github.com/hahaha678/gitrescue/internal/gitcmd"
 )
 
 // Severity 描述一条发现的紧急程度。

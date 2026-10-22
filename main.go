@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"os"
 
-	"gitrescue/internal/gitcmd"
-	"gitrescue/internal/i18n"
-	"gitrescue/internal/render"
-	"gitrescue/internal/scan"
-	"gitrescue/internal/style"
+	"github.com/hahaha678/gitrescue/internal/gitcmd"
+	"github.com/hahaha678/gitrescue/internal/i18n"
+	"github.com/hahaha678/gitrescue/internal/render"
+	"github.com/hahaha678/gitrescue/internal/scan"
+	"github.com/hahaha678/gitrescue/internal/style"
 )
 
 // version 在发布时用 -ldflags "-X main.version=v1.2.3" 覆盖。
