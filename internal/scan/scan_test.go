@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"gitrescue/internal/gitcmd"
+	"gitrescue/internal/i18n"
 	"gitrescue/internal/scan"
 )
 
@@ -160,5 +161,74 @@ func TestCleanRepoHasNoAlarms(t *testing.T) {
 	}
 	if _, ok := find(rep, "working-copy"); ok {
 		t.Error("clean tree should not report uncommitted changes")
+	}
+}
+
+// messyRepo 造一个"每种坑都踩了一点"的仓库，用来覆盖尽量多的文案。
+func messyRepo(t *testing.T) string {
+	t.Helper()
+	dir := newRepo(t)
+	commit(t, dir, "f.txt", "1", "first")
+	commit(t, dir, "f.txt", "2", "second")
+	commit(t, dir, "f.txt", "3", "third")
+	git(t, dir, "reset", "-q", "--hard", "HEAD~1") // third 变成只被 reflog 记住
+
+	write(t, dir, "f.txt", "wip")
+	git(t, dir, "stash", "-q")
+
+	git(t, dir, "checkout", "-q", "--detach")
+	commit(t, dir, "g.txt", "x", "experiment")
+
+	write(t, dir, "h.txt", "dirty")
+	return dir
+}
+
+// 中英文的参数顺序不同，写错时 fmt 会留下 "%!s(int=1)" 这样的痕迹。
+// 这个测试把所有文案在两种语言下都过一遍。
+func TestNoBrokenFormatVerbs(t *testing.T) {
+	dirs := []string{messyRepo(t), newRepo(t)}
+	commit(t, dirs[1], "a.txt", "1", "only commit")
+
+	defer i18n.Set("zh")
+	for _, lang := range []string{"zh", "en"} {
+		if !i18n.Set(lang) {
+			t.Fatalf("cannot switch to %s", lang)
+		}
+		for _, dir := range dirs {
+			rep := run(t, dir)
+			for _, f := range rep.Findings {
+				texts := append([]string{f.Title, f.Learn}, f.Detail...)
+				for _, c := range f.Commands {
+					texts = append(texts, c.Label, c.Line)
+				}
+				for _, s := range texts {
+					if strings.Contains(s, "%!") {
+						t.Errorf("[%s] broken format verb in %q", lang, s)
+					}
+				}
+			}
+			for _, n := range rep.Notes {
+				if strings.Contains(n, "%!") {
+					t.Errorf("[%s] broken format verb in note %q", lang, n)
+				}
+			}
+		}
+	}
+}
+
+// 没有任何远程仓库时，不该把本地提交当成"忘了 push"来报警。
+func TestNoRemoteIsInformational(t *testing.T) {
+	dir := newRepo(t)
+	commit(t, dir, "a.txt", "1", "first")
+
+	f, ok := find(run(t, dir), "unpushed")
+	if !ok {
+		t.Fatal("commits with nowhere to go should still be mentioned")
+	}
+	if f.Severity != scan.SeverityInfo {
+		t.Errorf("without any remote this should be info, got %v", f.Severity)
+	}
+	if !strings.Contains(f.Title, "main") {
+		t.Errorf("title should name the branch, got %q", f.Title)
 	}
 }

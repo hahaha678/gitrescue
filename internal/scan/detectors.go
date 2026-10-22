@@ -303,7 +303,12 @@ func unpushed(repo *gitcmd.Repo, branch string) []Finding {
 	// 连接口都没配过的仓库，提醒"没推送"意义不大，降级成提示。
 	if !hasRemote(repo) {
 		finding.Severity = SeverityInfo
-		finding.Title = fmt.Sprintf(i18n.T("分支 %s 上的 %d 个提交只在本地", "%d commit(s) on branch %s exist only locally"), n, branch)
+		// 中英文里分支名和数量的顺序相反，不能共用一条格式串。
+		if i18n.Get() == i18n.EN {
+			finding.Title = fmt.Sprintf("%d commit(s) on branch %s exist only locally", n, branch)
+		} else {
+			finding.Title = fmt.Sprintf("分支 %s 上的 %d 个提交只在本地", branch, n)
+		}
 		finding.Commands = []Command{
 			{Label: i18n.T("先接上远程仓库", "attach a remote first"), Line: "git remote add origin <仓库地址>"},
 		}
