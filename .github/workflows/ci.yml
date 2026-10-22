@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
+
+      - name: build
+        run: go build ./...
+
+      # 这个工具自己也得经得起自己的检查。
+      - name: dogfood
+        shell: bash
+        run: |
+          go run . --no-color --json > report.json
+          test -s report.json
+
+      - name: working tree must stay clean
+        shell: bash
+        run: test -z "$(git status --porcelain)"

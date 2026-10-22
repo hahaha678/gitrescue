@@ -1,0 +1,11 @@
+# 构建产物
+/gitrescue
+/gitrescue.exe
+/dist/
+
+# 测试与编辑器
+*.test
+*.out
+.vscode/
+.idea/
+.DS_Store
